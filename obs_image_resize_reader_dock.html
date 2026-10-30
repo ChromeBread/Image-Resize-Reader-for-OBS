@@ -1,0 +1,301 @@
+<!doctype html>
+<!--
+  Image Resize Reader - placement dock
+  Add in OBS: Docks -> Custom Browser Docks... and paste the "Dock URL" shown in the script settings.
+  Talks to OBS through obs-websocket v5 (built into OBS 28+).
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Image Resize Reader</title>
+<style>
+:root{
+  --bg:#1f2129;--panel:#272a34;--field:#1a1c23;--line:#3a3e4b;--text:#e3e5ec;--muted:#9296a6;
+  --accent:#4f8cff;--hover:#30343f;--sel:#2c4c86;--ok:#3ecf74;--warn:#f0b43c;--bad:#ef5a5a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--text);font:12px/1.4 "Segoe UI","Yu Gothic UI","Malgun Gothic","Microsoft JhengHei UI",sans-serif;
+  display:flex;flex-direction:column;overflow:hidden}
+button,input{font:inherit;color:inherit}
+.bar{display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--panel);border-bottom:1px solid var(--line)}
+.bar h1{font-size:12px;font-weight:600;margin:0;flex:1;letter-spacing:.02em}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--bad);flex:none}
+.dot.ok{background:var(--ok)}.dot.wait{background:var(--warn)}
+.ibtn{background:none;border:1px solid transparent;border-radius:4px;padding:2px 6px;cursor:pointer;color:var(--muted)}
+.ibtn:hover{background:var(--hover);color:var(--text)}
+main{flex:1;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:10px}
+.row{display:flex;align-items:center;gap:6px;min-width:0}
+.row>label{color:var(--muted);flex:none;min-width:64px}
+.grow{flex:1;min-width:0}
+input{background:var(--field);border:1px solid var(--line);border-radius:4px;padding:4px 6px;min-width:0;outline:none}
+input:focus{border-color:var(--accent)}
+.btn{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:4px 10px;cursor:pointer}
+.btn:hover{background:var(--hover)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.conn{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:8px;display:flex;flex-direction:column;gap:6px}
+.msg{color:var(--warn);font-size:11px}
+.pads{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.pad{flex:1 1 130px;max-width:210px;display:flex;flex-direction:column;gap:6px}
+.pad h2{font-size:11px;font-weight:600;margin:0;color:var(--muted);text-align:center}
+/* The frame stands for the canvas. */
+.grid{position:relative;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);
+  aspect-ratio:16/9;background:var(--field);border:1px solid var(--line);border-radius:3px;padding:5px}
+.grid::before,.grid::after{content:"";position:absolute;background:var(--line);pointer-events:none}
+.grid::before{left:12%;right:12%;top:50%;height:1px}
+.grid::after{top:12%;bottom:12%;left:50%;width:1px}
+.a{position:relative;z-index:1;background:none;border:0;padding:0;cursor:pointer;display:flex}
+.a i{display:block;width:13px;height:13px;margin:auto;background:var(--panel);border:1px solid var(--muted);border-radius:1px}
+.a[data-p^=t]{align-items:flex-start}.a[data-p^=t] i{margin-top:0}
+.a[data-p^=b]{align-items:flex-end}.a[data-p^=b] i{margin-bottom:0}
+.a[data-p$=l] i{margin-left:0}.a[data-p$=r] i{margin-right:0}
+.a:hover i,.a:focus-visible i{background:var(--hover);border-color:var(--text)}
+.a:focus-visible{outline:none}
+.a:active i{background:var(--accent);border-color:var(--accent)}
+.a.on i{background:var(--accent);border-color:#fff}
+.hint{color:var(--muted);font-size:11px;text-align:center;min-height:1.4em}
+footer{padding:4px 8px;border-top:1px solid var(--line);color:var(--muted);font-size:10px;text-align:right}
+.hidden{display:none!important}
+.disabled{opacity:.45;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="bar">
+  <span class="dot" id="dot"></span>
+  <h1>Image Resize Reader</h1>
+  <span id="status" style="color:var(--muted);font-size:11px"></span>
+  <button class="ibtn" id="gear" aria-label="Connection">⚙</button>
+</div>
+
+<main>
+  <div class="conn hidden" id="conn">
+    <div class="row"><label data-i18n="host" for="host"></label><input type="text" id="host" class="grow" value="localhost"></div>
+    <div class="row"><label data-i18n="port" for="port"></label><input type="number" id="port" value="4455" min="1" max="65535" style="width:90px"></div>
+    <div class="row"><label data-i18n="password" for="pass"></label><input type="password" id="pass" class="grow"></div>
+    <div class="row"><span class="grow msg" id="connMsg"></span><button class="btn primary" id="connectBtn"></button></div>
+  </div>
+
+  <div class="pads" id="pads">
+    <section class="pad"><h2 data-i18n="move_now"></h2><div class="grid" id="moveGrid"></div></section>
+    <section class="pad"><h2 data-i18n="on_load"></h2><div class="grid" id="loadGrid"></div></section>
+  </div>
+  <div class="hint" id="hint"></div>
+</main>
+
+<footer id="meta"></footer>
+
+<script>
+"use strict";
+const I18N = {
+  en:{host:"Host",port:"Port",password:"Password",connect:"Connect",disconnect:"Disconnect",st_connected:"Connected",st_connecting:"Connecting…",st_disconnected:"Disconnected",
+    auth_failed:"Wrong password.",conn_failed:"Could not connect. Enable the WebSocket server in Tools → WebSocket Server Settings.",
+    move_now:"Move selected",on_load:"Position on load",no_script:"Load the script in Tools → Scripts.",
+    tl:"Top left",tc:"Top",tr:"Top right",ml:"Left",mc:"Center",mr:"Right",bl:"Bottom left",bc:"Bottom",br:"Bottom right"},
+  ja:{host:"ホスト",port:"ポート",password:"パスワード",connect:"接続",disconnect:"切断",st_connected:"接続中",st_connecting:"接続しています…",st_disconnected:"未接続",
+    auth_failed:"パスワードが違います。",conn_failed:"接続できません。ツール → WebSocketサーバー設定 でサーバーを有効にしてください。",
+    move_now:"選択中を移動",on_load:"読み込み時の位置",no_script:"ツール → スクリプト でスクリプトを読み込んでください。",
+    tl:"左上",tc:"上",tr:"右上",ml:"左",mc:"中央",mr:"右",bl:"左下",bc:"下",br:"右下"},
+  ko:{host:"호스트",port:"포트",password:"비밀번호",connect:"연결",disconnect:"연결 해제",st_connected:"연결됨",st_connecting:"연결 중…",st_disconnected:"연결 안 됨",
+    auth_failed:"비밀번호가 올바르지 않습니다.",conn_failed:"연결할 수 없습니다. 도구 → WebSocket 서버 설정에서 서버를 활성화하세요.",
+    move_now:"선택 항목 이동",on_load:"불러올 때 위치",no_script:"도구 → 스크립트에서 스크립트를 불러오세요.",
+    tl:"왼쪽 위",tc:"위",tr:"오른쪽 위",ml:"왼쪽",mc:"가운데",mr:"오른쪽",bl:"왼쪽 아래",bc:"아래",br:"오른쪽 아래"},
+  id:{host:"Host",port:"Port",password:"Kata sandi",connect:"Hubungkan",disconnect:"Putuskan",st_connected:"Terhubung",st_connecting:"Menghubungkan…",st_disconnected:"Terputus",
+    auth_failed:"Kata sandi salah.",conn_failed:"Tidak dapat terhubung. Aktifkan server WebSocket di Alat → Pengaturan Server WebSocket.",
+    move_now:"Pindahkan pilihan",on_load:"Posisi saat dimuat",no_script:"Muat skrip di Alat → Skrip.",
+    tl:"Kiri atas",tc:"Atas",tr:"Kanan atas",ml:"Kiri",mc:"Tengah",mr:"Kanan",bl:"Kiri bawah",bc:"Bawah",br:"Kanan bawah"},
+  fr:{host:"Hôte",port:"Port",password:"Mot de passe",connect:"Connecter",disconnect:"Déconnecter",st_connected:"Connecté",st_connecting:"Connexion…",st_disconnected:"Déconnecté",
+    auth_failed:"Mot de passe incorrect.",conn_failed:"Connexion impossible. Activez le serveur WebSocket dans Outils → Paramètres du serveur WebSocket.",
+    move_now:"Déplacer la sélection",on_load:"Position au chargement",no_script:"Chargez le script dans Outils → Scripts.",
+    tl:"En haut à gauche",tc:"En haut",tr:"En haut à droite",ml:"À gauche",mc:"Centre",mr:"À droite",bl:"En bas à gauche",bc:"En bas",br:"En bas à droite"},
+  zh_TW:{host:"主機",port:"連接埠",password:"密碼",connect:"連線",disconnect:"中斷連線",st_connected:"已連線",st_connecting:"連線中…",st_disconnected:"未連線",
+    auth_failed:"密碼錯誤。",conn_failed:"無法連線。請在 工具 → WebSocket 伺服器設定 中啟用伺服器。",
+    move_now:"移動選取項目",on_load:"載入時的位置",no_script:"請在 工具 → 腳本 中載入腳本。",
+    tl:"左上",tc:"上",tr:"右上",ml:"左",mc:"中央",mr:"右",bl:"左下",bc:"下",br:"右下"},
+};
+const POSITIONS = ["tl","tc","tr","ml","mc","mr","bl","bc","br"];
+const STATE_JS = "obs_image_resize_reader_state.js";
+const $ = (id) => document.getElementById(id);
+
+let L = I18N.en, lang = "en", loadPos = "mc", scriptSeen = false;
+const t = (k) => L[k] ?? I18N.en[k] ?? k;
+function applyI18n() {
+  document.documentElement.lang = lang.replace("_", "-");
+  document.querySelectorAll("[data-i18n]").forEach(el => el.textContent = t(el.dataset.i18n));
+  document.querySelectorAll(".a").forEach(el => { el.title = t(el.dataset.p); el.setAttribute("aria-label", t(el.dataset.p)); });
+  renderStatus();
+}
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("irr." + k); return v === null ? d : v; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("irr." + k, v); } catch {} },
+};
+
+/* ---------------------------------------------------------------- SHA-256 */
+function sha256js(bytes) {
+  const K = [], H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  for (let p = 2, n = 0; n < 64; p++) {
+    let prime = true;
+    for (let d = 2; d * d <= p; d++) if (p % d === 0) { prime = false; break; }
+    if (prime) K[n++] = (Math.pow(p, 1 / 3) * 4294967296) | 0;
+  }
+  const l = bytes.length, total = ((l + 9 + 63) >> 6) << 6;
+  const m = new Uint8Array(total); m.set(bytes); m[l] = 0x80;
+  const dv = new DataView(m.buffer);
+  dv.setUint32(total - 4, (l * 8) >>> 0); dv.setUint32(total - 8, Math.floor(l / 0x20000000));
+  const w = new Uint32Array(64), rotr = (x, n) => (x >>> n) | (x << (32 - n));
+  for (let i = 0; i < total; i += 64) {
+    for (let j = 0; j < 16; j++) w[j] = dv.getUint32(i + j * 4);
+    for (let j = 16; j < 64; j++) {
+      const s0 = rotr(w[j-15], 7) ^ rotr(w[j-15], 18) ^ (w[j-15] >>> 3);
+      const s1 = rotr(w[j-2], 17) ^ rotr(w[j-2], 19) ^ (w[j-2] >>> 10);
+      w[j] = (w[j-16] + s0 + w[j-7] + s1) | 0;
+    }
+    let [a, b, c, d, e, f, g, h] = H;
+    for (let j = 0; j < 64; j++) {
+      const t1 = (h + (rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25)) + ((e & f) ^ (~e & g)) + K[j] + w[j]) | 0;
+      const t2 = ((rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22)) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+      h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+    }
+    H[0] = (H[0] + a) | 0; H[1] = (H[1] + b) | 0; H[2] = (H[2] + c) | 0; H[3] = (H[3] + d) | 0;
+    H[4] = (H[4] + e) | 0; H[5] = (H[5] + f) | 0; H[6] = (H[6] + g) | 0; H[7] = (H[7] + h) | 0;
+  }
+  const out = new Uint8Array(32), odv = new DataView(out.buffer);
+  H.forEach((v, i) => odv.setUint32(i * 4, v >>> 0));
+  return out;
+}
+async function sha256b64(str) {
+  const bytes = new TextEncoder().encode(str);
+  let digest;
+  try { digest = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)); }
+  catch { digest = sha256js(bytes); }
+  return btoa(String.fromCharCode(...digest));
+}
+
+/* ---------------------------------------------------------- obs-websocket */
+const obs = {
+  ws: null, ready: false, reqId: 0, pending: new Map(), wanted: false,
+  connect(host, port, password) {
+    this.close();
+    this.wanted = true;
+    setStatus("wait");
+    return new Promise((resolve, reject) => {
+      let ws;
+      try { ws = new WebSocket(`ws://${host}:${port}`); } catch (e) { setStatus("bad"); return reject(e); }
+      this.ws = ws;
+      ws.onmessage = async (ev) => {
+        const msg = JSON.parse(ev.data);
+        if (msg.op === 0) {
+          const d = { rpcVersion: 1, eventSubscriptions: 0 };
+          const a = msg.d.authentication;
+          if (a) d.authentication = await sha256b64((await sha256b64(password + a.salt)) + a.challenge);
+          ws.send(JSON.stringify({ op: 1, d }));
+        } else if (msg.op === 2) {
+          this.ready = true; setStatus("ok"); resolve();
+        } else if (msg.op === 7) {
+          const p = this.pending.get(msg.d.requestId);
+          if (!p) return;
+          this.pending.delete(msg.d.requestId);
+          msg.d.requestStatus.result ? p.res(msg.d.responseData || {})
+            : p.rej(new Error(msg.d.requestStatus.comment || ("code " + msg.d.requestStatus.code)));
+        }
+      };
+      ws.onclose = (e) => {
+        if (this.ws !== ws) return; // closed on purpose: a newer connection may already be in place
+        const wasReady = this.ready;
+        this.ready = false; this.ws = null;
+        for (const p of this.pending.values()) p.rej(new Error("closed"));
+        this.pending.clear();
+        setStatus("bad", e.code === 4009 ? "auth_failed" : (wasReady ? "" : "conn_failed"));
+        reject(new Error("closed " + e.code));
+        if (this.wanted && e.code !== 4009) setTimeout(() => { if (this.wanted && !this.ws) autoConnect(); }, 5000);
+      };
+    });
+  },
+  close() {
+    this.wanted = false;
+    if (this.ws) { try { this.ws.close(); } catch {} }
+    this.ws = null; this.ready = false;
+    for (const p of this.pending.values()) p.rej(new Error("closed"));
+    this.pending.clear();
+  },
+  call(requestType, requestData = {}) {
+    if (!this.ready) return Promise.reject(new Error("not connected"));
+    const requestId = "r" + (++this.reqId);
+    return new Promise((res, rej) => {
+      this.pending.set(requestId, { res, rej });
+      this.ws.send(JSON.stringify({ op: 6, d: { requestType, requestId, requestData } }));
+    });
+  },
+};
+
+let statusKind = "bad", statusMsg = "";
+function setStatus(kind, msg = "") { statusKind = kind; statusMsg = msg; renderStatus(); }
+function renderStatus() {
+  $("dot").className = "dot " + (statusKind === "ok" ? "ok" : statusKind === "wait" ? "wait" : "");
+  $("status").textContent = t(statusKind === "ok" ? "st_connected" : statusKind === "wait" ? "st_connecting" : "st_disconnected");
+  $("connMsg").textContent = statusMsg && t(statusMsg);
+  $("connectBtn").textContent = statusKind === "ok" ? t("disconnect") : t("connect");
+  if (statusKind === "bad" && statusMsg) $("conn").classList.remove("hidden");
+  $("pads").classList.toggle("disabled", statusKind !== "ok");
+}
+
+function autoConnect() {
+  const host = $("host").value.trim() || "localhost", port = $("port").value || "4455";
+  obs.connect(host, port, $("pass").value).catch(() => {});
+}
+
+/* ------------------------------------------------------------ script state */
+function pollState() {
+  const s = document.createElement("script");
+  s.charset = "utf-8";
+  s.src = STATE_JS + "?t=" + Date.now();
+  s.onload = () => s.remove();
+  s.onerror = () => { s.remove(); if (!scriptSeen) $("hint").textContent = t("no_script"); };
+  document.head.appendChild(s);
+}
+window.irrState = (st) => {
+  scriptSeen = true;
+  $("hint").textContent = "";
+  if (st.lang && st.lang !== lang) { lang = I18N[st.lang] ? st.lang : "en"; L = I18N[lang]; applyI18n(); }
+  loadPos = st.pos;
+  renderLoadGrid();
+  $("meta").textContent = `${st.name} v${st.version} · ${st.buildDate} · ${st.author}`;
+};
+
+/* ----------------------------------------------------------------- buttons */
+function buildGrid(id, onClick) {
+  for (const p of POSITIONS) {
+    const b = document.createElement("button");
+    b.className = "a"; b.dataset.p = p;
+    b.append(document.createElement("i"));
+    b.onclick = () => onClick(p);
+    $(id).append(b);
+  }
+}
+function renderLoadGrid() {
+  $("loadGrid").querySelectorAll(".a").forEach(b => b.classList.toggle("on", b.dataset.p === loadPos));
+}
+const trigger = (name) => obs.call("TriggerHotkeyByName", { hotkeyName: name }).catch(() => {});
+
+buildGrid("moveGrid", (p) => trigger("irr_move_" + p));
+buildGrid("loadGrid", (p) => { loadPos = p; renderLoadGrid(); trigger("irr_load_" + p); });
+
+$("gear").onclick = () => $("conn").classList.toggle("hidden");
+$("connectBtn").onclick = () => {
+  if (statusKind === "ok") { obs.close(); setStatus("bad"); return; }
+  store.set("host", $("host").value); store.set("port", $("port").value); store.set("pass", $("pass").value);
+  autoConnect();
+};
+$("host").value = store.get("host", "localhost");
+$("port").value = store.get("port", "4455");
+$("pass").value = store.get("pass", "");
+
+applyI18n();
+renderLoadGrid();
+pollState();
+setInterval(pollState, 1500);
+autoConnect();
+</script>
+</body>
+</html>
