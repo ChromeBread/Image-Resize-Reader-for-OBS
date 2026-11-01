@@ -20,7 +20,7 @@ local bit = require("bit")
 --------------------------------------------------------------------------------
 local SCRIPT_NAME = "Image Resize Reader"
 local GAME_ID     = "irr_game_image"
-local VERSION     = "1.1.0"
+local VERSION     = "1.2.0"
 local BUILD_DATE  = { year = 2026, month = 11, day = 1 }
 local AUTHOR      = "ChromeBread feat. BlackDream"
 local DOCK_HTML   = "obs_image_resize_reader_dock.html"

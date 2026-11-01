@@ -1,6 +1,10 @@
+**English** | [日本語](README.ja.md) | [한국어](README.ko.md) | [Bahasa Indonesia](README.id.md) | [Français](README.fr.md) | [繁體中文](README.zh-TW.md)
+
 # Image Resize Reader for OBS
 
 An OBS Studio (Windows) Lua script that fits images and videos to the canvas the moment they are added, so a huge picture never lands half off-screen.
+
+<p><img src="docs/images/en/image_settings.png" alt="Image Resize Reader settings" width="340"> <img src="docs/images/en/image_dock.png" alt="Image Resize Reader dock" width="340"></p>
 
 - Size: 1–100 % of the canvas, a pixel size, or original size. Fit to width, height, or both (stay inside)
 - Optional enlarging of small images to the chosen size
