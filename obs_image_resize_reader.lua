@@ -69,7 +69,7 @@ local I18N = {
 		version = "Version", build_date = "Build date", author = "Author",
 		language = "Language", lang_auto = "Auto (OBS)",
 		lang_note = "Reload the script (⟳) to apply the language to the description and the source name.",
-		debug_on = "Debug Mode ✅", debug_off = "Debug Mode ⬜",
+		debug_mode_label = "Debug Mode",
 		dock_url = "Dock URL",
 		dock_howto = "1. Copy the Dock URL.\n2. In OBS: Docks → Custom Browser Docks… → enter a name and paste the URL.\n3. The dock talks to OBS via WebSocket (Tools → WebSocket Server Settings). Enter the same port / password below.",
 		auto_fit = "Fit automatically on load",
@@ -96,7 +96,7 @@ local I18N = {
 		version = "バージョン", build_date = "ビルド日", author = "製作者",
 		language = "言語", lang_auto = "自動 (OBS)",
 		lang_note = "説明文とソース名への言語反映は、スクリプトの再読み込み (⟳) 後に行われます。",
-		debug_on = "デバッグモード ✅", debug_off = "デバッグモード ⬜",
+		debug_mode_label = "デバッグモード",
 		dock_url = "ドックURL",
 		dock_howto = "1. ドックURLをコピーします。\n2. OBSの「ドック → カスタムブラウザドック…」で名前を入力し、URLを貼り付けます。\n3. ドックは WebSocket（ツール → WebSocketサーバー設定）でOBSと通信します。同じポートとパスワードを下の欄に入力します。",
 		auto_fit = "読み込み時に自動で調整する",
@@ -123,7 +123,7 @@ local I18N = {
 		version = "버전", build_date = "빌드 날짜", author = "제작자",
 		language = "언어", lang_auto = "자동 (OBS)",
 		lang_note = "설명과 소스 이름에 언어를 적용하려면 스크립트를 다시 불러오세요 (⟳).",
-		debug_on = "디버그 모드 ✅", debug_off = "디버그 모드 ⬜",
+		debug_mode_label = "디버그 모드",
 		dock_url = "도크 URL",
 		dock_howto = "1. 도크 URL을 복사합니다.\n2. OBS에서 도크 → 사용자 지정 브라우저 도크… 에 이름을 입력하고 URL을 붙여넣습니다.\n3. 도크는 WebSocket(도구 → WebSocket 서버 설정)으로 OBS와 통신합니다. 같은 포트와 비밀번호를 아래 칸에 입력하세요.",
 		auto_fit = "불러올 때 자동으로 조정",
@@ -150,7 +150,7 @@ local I18N = {
 		version = "Versi", build_date = "Tanggal build", author = "Pembuat",
 		language = "Bahasa", lang_auto = "Otomatis (OBS)",
 		lang_note = "Muat ulang skrip (⟳) untuk menerapkan bahasa pada deskripsi dan nama sumber.",
-		debug_on = "Mode Debug ✅", debug_off = "Mode Debug ⬜",
+		debug_mode_label = "Mode Debug",
 		dock_url = "URL Dock",
 		dock_howto = "1. Salin URL Dock.\n2. Di OBS: Dock → Dock Peramban Kustom… → masukkan nama dan tempel URL.\n3. Dock berkomunikasi dengan OBS melalui WebSocket (Alat → Pengaturan Server WebSocket). Masukkan port / kata sandi yang sama di bawah.",
 		auto_fit = "Sesuaikan otomatis saat dimuat",
@@ -177,7 +177,7 @@ local I18N = {
 		version = "Version", build_date = "Date de build", author = "Auteur",
 		language = "Langue", lang_auto = "Automatique (OBS)",
 		lang_note = "Rechargez le script (⟳) pour appliquer la langue à la description et au nom de la source.",
-		debug_on = "Mode débogage ✅", debug_off = "Mode débogage ⬜",
+		debug_mode_label = "Mode débogage",
 		dock_url = "URL du dock",
 		dock_howto = "1. Copiez l'URL du dock.\n2. Dans OBS : Docks → Docks de navigateur personnalisés… → saisissez un nom et collez l'URL.\n3. Le dock communique avec OBS via WebSocket (Outils → Paramètres du serveur WebSocket). Saisissez le même port / mot de passe ci-dessous.",
 		auto_fit = "Ajuster automatiquement au chargement",
@@ -204,7 +204,7 @@ local I18N = {
 		version = "版本", build_date = "建置日期", author = "製作者",
 		language = "語言", lang_auto = "自動 (OBS)",
 		lang_note = "重新載入腳本 (⟳) 後，說明文字與來源名稱才會套用新語言。",
-		debug_on = "偵錯模式 ✅", debug_off = "偵錯模式 ⬜",
+		debug_mode_label = "偵錯模式",
 		dock_url = "Dock 網址",
 		dock_howto = "1. 複製 Dock 網址。\n2. 在 OBS 中：停駐視窗 → 自訂瀏覽器停駐視窗… → 輸入名稱並貼上網址。\n3. Dock 透過 WebSocket（工具 → WebSocket 伺服器設定）與 OBS 通訊，請在下方輸入相同的連接埠與密碼。",
 		auto_fit = "載入時自動調整",
@@ -1053,8 +1053,7 @@ local function apply_script_props(props, settings)
 		local p = obs.obs_properties_get(props, name)
 		if p then obs.obs_property_set_description(p, T(key)) end
 	end
-	obs.obs_property_set_description(obs.obs_properties_get(props, "debug_toggle"),
-		debug_mode and T("debug_on") or T("debug_off"))
+	obs.obs_property_set_description(obs.obs_properties_get(props, "debug_mode"), T("debug_mode_label"))
 	local mode = obs.obs_data_get_string(settings or script_settings, "size_mode")
 	obs.obs_property_set_visible(obs.obs_properties_get(props, "percent"), mode == "percent")
 	obs.obs_property_set_visible(obs.obs_properties_get(props, "px_w"), mode == "pixels")
@@ -1162,9 +1161,10 @@ local function add_debug_props(props)
 	obs.obs_properties_add_text(props, "backup_status", " ", obs.OBS_TEXT_INFO)
 end
 
-local function on_debug_toggle(props, _)
-	debug_mode = not debug_mode
-	if script_settings then obs.obs_data_set_bool(script_settings, "debug_mode", debug_mode) end
+local function on_debug_changed(props, _, settings)
+	local on = obs.obs_data_get_bool(settings, "debug_mode")
+	if on == debug_mode then return false end
+	debug_mode = on
 	apply_script_props(props)
 	return true
 end
@@ -1220,7 +1220,8 @@ function script_properties()
 	obs.obs_properties_add_text(props, "ws_host", T("ws_host"), obs.OBS_TEXT_DEFAULT)
 	obs.obs_properties_add_int(props, "ws_port", T("ws_port"), 1, 65535, 1)
 	obs.obs_properties_add_text(props, "ws_password", T("ws_password"), obs.OBS_TEXT_PASSWORD)
-	obs.obs_properties_add_button(props, "debug_toggle", T("debug_off"), on_debug_toggle)
+	local debug_prop = obs.obs_properties_add_bool(props, "debug_mode", T("debug_mode_label"))
+	obs.obs_property_set_modified_callback(debug_prop, on_debug_changed)
 
 	add_debug_props(props)
 	apply_script_props(props)
