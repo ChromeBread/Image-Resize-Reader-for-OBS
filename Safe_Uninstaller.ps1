@@ -206,30 +206,30 @@ $installDirs = @(Get-InstallDirs $registrations)
 
 $form = New-Object System.Windows.Forms.Form
 $form.StartPosition = 'CenterScreen'
-$form.ClientSize = New-Object System.Drawing.Size(760, 500)
-$form.MinimumSize = New-Object System.Drawing.Size(640, 420)
+$form.ClientSize = New-Object System.Drawing.Size(790, 500)
+$form.MinimumSize = New-Object System.Drawing.Size(806, 420)
 $form.Font = New-Object System.Drawing.Font('Segoe UI', 10)
 
 $langLabel = New-Object System.Windows.Forms.Label
 $langLabel.Location = '12,15'; $langLabel.AutoSize = $true
 $langBox = New-Object System.Windows.Forms.ComboBox
-$langBox.Location = '140,12'; $langBox.Width = 200; $langBox.DropDownStyle = 'DropDownList'
+$langBox.Location = '152,12'; $langBox.Width = 200; $langBox.DropDownStyle = 'DropDownList'
 $langNames = [ordered]@{ en = 'English'; ja = '日本語'; ko = '한국어'; id = 'Bahasa Indonesia'; fr = 'Français'; 'zh-TW' = '繁體中文' }
 [void]$langBox.Items.AddRange([object[]]@($langNames.Values))
 
 $folderLabel = New-Object System.Windows.Forms.Label
 $folderLabel.Location = '12,49'; $folderLabel.AutoSize = $true
 $folderBox = New-Object System.Windows.Forms.ComboBox
-$folderBox.Location = '140,46'; $folderBox.Width = 608; $folderBox.DropDownStyle = 'DropDownList'; $folderBox.Anchor = 'Top,Left,Right'
+$folderBox.Location = '152,46'; $folderBox.Width = 626; $folderBox.DropDownStyle = 'DropDownList'; $folderBox.Anchor = 'Top,Left,Right'
 if ($installDirs.Count) { [void]$folderBox.Items.AddRange([object[]]$installDirs) }
 
 $list = New-Object System.Windows.Forms.ListView
-$list.Location = '12,82'; $list.Size = New-Object System.Drawing.Size(736, 280); $list.Anchor = 'Top,Bottom,Left,Right'
+$list.Location = '12,82'; $list.Size = New-Object System.Drawing.Size(766, 280); $list.Anchor = 'Top,Bottom,Left,Right'
 $list.View = 'Details'; $list.CheckBoxes = $true; $list.FullRowSelect = $true
 [void]$list.Columns.Add('', 330); [void]$list.Columns.Add('', 290); [void]$list.Columns.Add('', 90)
 
 $status = New-Object System.Windows.Forms.Label
-$status.Location = '12,370'; $status.Size = New-Object System.Drawing.Size(736, 70); $status.Anchor = 'Bottom,Left,Right'
+$status.Location = '12,370'; $status.Size = New-Object System.Drawing.Size(766, 70); $status.Anchor = 'Bottom,Left,Right'
 
 $backupBtn = New-Object System.Windows.Forms.Button
 $moveBtn = New-Object System.Windows.Forms.Button
@@ -238,7 +238,7 @@ $closeBtn = New-Object System.Windows.Forms.Button
 $x = 12
 foreach ($b in $backupBtn, $moveBtn, $removeBtn, $closeBtn) {
   $b.Location = New-Object System.Drawing.Point($x, 450); $b.Height = 36; $b.Anchor = 'Bottom,Left'
-  $b.Width = if ($b -eq $removeBtn) { 280 } elseif ($b -eq $closeBtn) { 80 } else { 180 }
+  $b.Width = if ($b -eq $removeBtn) { 280 } elseif ($b -eq $closeBtn) { 80 } else { 200 }
   $x += $b.Width + 6
 }
 $form.Controls.AddRange(@($langLabel, $langBox, $folderLabel, $folderBox, $list, $status, $backupBtn, $moveBtn, $removeBtn, $closeBtn))
