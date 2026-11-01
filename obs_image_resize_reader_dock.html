@@ -260,7 +260,7 @@ window.irrState = (st) => {
   if (st.lang && st.lang !== lang) { lang = I18N[st.lang] ? st.lang : "en"; L = I18N[lang]; applyI18n(); }
   loadPos = st.pos;
   renderLoadGrid();
-  $("meta").textContent = `${st.name} v${st.version} · ${st.buildDate} · ${st.author}`;
+  $("meta").textContent = `${st.name} v${st.version} · ${st.buildDate}`;
 };
 
 /* ----------------------------------------------------------------- buttons */
@@ -295,6 +295,9 @@ applyI18n();
 renderLoadGrid();
 pollState();
 setInterval(pollState, 1500);
+const mainEl = document.querySelector("main");
+mainEl.scrollTop = Number(store.get("scroll", 0));
+mainEl.addEventListener("scroll", () => store.set("scroll", mainEl.scrollTop));
 autoConnect();
 </script>
 </body>
