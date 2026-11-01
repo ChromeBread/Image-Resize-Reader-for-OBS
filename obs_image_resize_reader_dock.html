@@ -65,16 +65,10 @@ footer{padding:4px 8px;border-top:1px solid var(--line);color:var(--muted);font-
   <span class="dot" id="dot"></span>
   <h1>Image Resize Reader</h1>
   <span id="status" style="color:var(--muted);font-size:11px"></span>
-  <button class="ibtn" id="gear" aria-label="Connection">⚙</button>
 </div>
 
 <main>
-  <div class="conn hidden" id="conn">
-    <div class="row"><label data-i18n="host" for="host"></label><input type="text" id="host" class="grow" value="localhost"></div>
-    <div class="row"><label data-i18n="port" for="port"></label><input type="number" id="port" value="4455" min="1" max="65535" style="width:90px"></div>
-    <div class="row"><label data-i18n="password" for="pass"></label><input type="password" id="pass" class="grow"></div>
-    <div class="row"><span class="grow msg" id="connMsg"></span><button class="btn primary" id="connectBtn"></button></div>
-  </div>
+  <div class="conn hidden" id="conn"><span class="msg" id="connMsg"></span></div>
 
   <div class="pads" id="pads">
     <section class="pad"><h2 data-i18n="move_now"></h2><div class="grid" id="moveGrid"></div></section>
@@ -83,7 +77,6 @@ footer{padding:4px 8px;border-top:1px solid var(--line);color:var(--muted);font-
   <div class="hint" id="hint"></div>
 </main>
 
-<footer id="meta"></footer>
 
 <script>
 "use strict";
@@ -235,14 +228,14 @@ function renderStatus() {
   $("dot").className = "dot " + (statusKind === "ok" ? "ok" : statusKind === "wait" ? "wait" : "");
   $("status").textContent = t(statusKind === "ok" ? "st_connected" : statusKind === "wait" ? "st_connecting" : "st_disconnected");
   $("connMsg").textContent = statusMsg && t(statusMsg);
-  $("connectBtn").textContent = statusKind === "ok" ? t("disconnect") : t("connect");
   if (statusKind === "bad" && statusMsg) $("conn").classList.remove("hidden");
   $("pads").classList.toggle("disabled", statusKind !== "ok");
 }
 
+let wsCfg = null;
 function autoConnect() {
-  const host = $("host").value.trim() || "localhost", port = $("port").value || "4455";
-  obs.connect(host, port, $("pass").value).catch(() => {});
+  if (!wsCfg) return;
+  obs.connect(wsCfg.host, wsCfg.port, wsCfg.password).catch(() => {});
 }
 
 /* ------------------------------------------------------------ script state */
@@ -260,7 +253,7 @@ window.irrState = (st) => {
   if (st.lang && st.lang !== lang) { lang = I18N[st.lang] ? st.lang : "en"; L = I18N[lang]; applyI18n(); }
   loadPos = st.pos;
   renderLoadGrid();
-  $("meta").textContent = `${st.name} v${st.version} · ${st.buildDate}`;
+  if (JSON.stringify(st.ws) !== JSON.stringify(wsCfg)) { wsCfg = st.ws; autoConnect(); }
 };
 
 /* ----------------------------------------------------------------- buttons */
@@ -281,15 +274,7 @@ const trigger = (name) => obs.call("TriggerHotkeyByName", { hotkeyName: name }).
 buildGrid("moveGrid", (p) => trigger("irr_move_" + p));
 buildGrid("loadGrid", (p) => { loadPos = p; renderLoadGrid(); trigger("irr_load_" + p); });
 
-$("gear").onclick = () => $("conn").classList.toggle("hidden");
-$("connectBtn").onclick = () => {
-  if (statusKind === "ok") { obs.close(); setStatus("bad"); return; }
-  store.set("host", $("host").value); store.set("port", $("port").value); store.set("pass", $("pass").value);
-  autoConnect();
-};
-$("host").value = store.get("host", "localhost");
-$("port").value = store.get("port", "4455");
-$("pass").value = store.get("pass", "");
+try { for (const k of ["host", "port", "pass"]) localStorage.removeItem("irr." + k); } catch {}
 
 applyI18n();
 renderLoadGrid();

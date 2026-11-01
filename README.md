@@ -22,7 +22,7 @@ Items already in a scene, and sources added again from another scene, are left a
 1. Keep `obs_image_resize_reader.lua` and `obs_image_resize_reader_dock.html` in the same folder.
 2. OBS → **Tools → Scripts → +** → select `obs_image_resize_reader.lua`.
 3. Press **Show Dock URL**, copy the **Dock URL**, then **Docks → Custom Browser Docks…** → paste it.
-4. Enable **Tools → WebSocket Server Settings** and enter the port / password in the dock (⚙).
+4. Enable **Tools → WebSocket Server Settings** and enter the same port / password in the script settings.
 
 ## Uninstall
 Remove the script from **Tools → Scripts** (select it, press **−**), close OBS, then run `Safe_Uninstaller.bat`. It shows what each file is, lets you choose what to remove, backs up your settings, explains moving to another PC, and sends everything to the Recycle Bin.

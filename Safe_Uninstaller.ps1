@@ -89,12 +89,14 @@ function Get-ObsLanguage {
 # Scene collections keep each registered script's path, which also finds copies from old installs.
 function Get-Registrations($scenesDir) {
   $found = @()
+  $mains = @($Config.main) + @($Config.oldMains) | Where-Object { $_ }
+  if (-not $mains) { return $found }
   if (-not (Test-Path -LiteralPath $scenesDir)) { return $found }
   foreach ($file in Get-ChildItem -LiteralPath $scenesDir -Filter '*.json' -File) {
     try {
       $json = Get-Content -Raw -Encoding UTF8 -LiteralPath $file.FullName | ConvertFrom-Json
       foreach ($script in @($json.modules.'scripts-tool')) {
-        if ($script.path -and ((Split-Path -Leaf $script.path) -ieq $Config.main)) {
+        if ($script.path -and ($mains -contains (Split-Path -Leaf $script.path))) {
           $found += [pscustomobject]@{ Collection = $json.name; Dir = (Split-Path -Parent $script.path).Replace('/', '\') }
         }
       }
@@ -172,6 +174,16 @@ if ($SelfTest) {
   if ($items.Count -ne $listed.Count) { throw 'listed items were not found' }
   if ($items.Name -contains 'keep_me.txt') { throw 'an unlisted file was offered' }
   foreach ($bad in '..', '..\x', 'a/b', 'C:\Windows') { if (Test-SafeName $bad) { throw "unsafe name accepted: $bad" } }
+  if ($Config.main) {
+    $scenes = Join-Path $SelfTest 'scenes'
+    New-Item -ItemType Directory -Path $scenes | Out-Null
+    foreach ($name in @($Config.main) + @($Config.oldMains) | Where-Object { $_ }) {
+      $scene = @{ name = 'test'; modules = @{ 'scripts-tool' = @(@{ path = (Join-Path $probe $name).Replace('\', '/') }) } }
+      $scene | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $scenes "$name.json") -Encoding UTF8
+    }
+    $expected = @(@($Config.main) + @($Config.oldMains) | Where-Object { $_ }).Count
+    if (@(Get-Registrations $scenes).Count -ne $expected) { throw 'a registered script name was not found' }
+  }
   $saved = @($items | Where-Object Kind -eq 'settings')
   $backup = Backup-Settings $saved $SelfTest
   foreach ($item in $saved) { if (-not (Test-Path -LiteralPath (Join-Path $backup $item.Name))) { throw 'backup is missing a file' } }

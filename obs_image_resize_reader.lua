@@ -56,6 +56,7 @@ local LANG_NAMES = {
 
 local I18N = {
 	en = {
+		ws_host = "WebSocket host", ws_port = "WebSocket port", ws_password = "WebSocket password",
 		dock_show = "Show Dock URL", dock_hide = "Hide Dock URL",
 		uninstall_info = "<b>Uninstall</b><br>1. Export your settings below if you want to keep them.<br>2. Tools → Scripts: select this script and press −.<br>3. Run Safe_Uninstaller.bat from the folder below. To remove files by hand, delete only these and leave the folder itself:<br><br>%s<br>%s",
 		backup_export_file = "Export settings to", backup_export = "Export settings",
@@ -70,7 +71,7 @@ local I18N = {
 		lang_note = "Reload the script (⟳) to apply the language to the description and the source name.",
 		debug_on = "Debug Mode: ON", debug_off = "Debug Mode: OFF",
 		dock_url = "Dock URL",
-		dock_howto = "1. Copy the Dock URL.\n2. In OBS: Docks → Custom Browser Docks… → enter a name and paste the URL.\n3. The dock talks to OBS via WebSocket (Tools → WebSocket Server Settings). Enter the port / password in the dock (⚙).",
+		dock_howto = "1. Copy the Dock URL.\n2. In OBS: Docks → Custom Browser Docks… → enter a name and paste the URL.\n3. The dock talks to OBS via WebSocket (Tools → WebSocket Server Settings). Enter the same port / password below.",
 		auto_fit = "Fit automatically on load",
 		size_mode = "Size", mode_percent = "Percent of canvas", mode_pixels = "Pixel size", mode_original = "Original size",
 		fit_axis = "Fit to", axis_both = "Width and height (stay inside)", axis_width = "Width", axis_height = "Height",
@@ -82,6 +83,7 @@ local I18N = {
 		file = "File", file_filter = "Game images", texture = "Texture", err_load = "⚠ This file could not be read: %s",
 	},
 	ja = {
+		ws_host = "WebSocket ホスト", ws_port = "WebSocket ポート", ws_password = "WebSocket パスワード",
 		dock_show = "ドックURLを表示", dock_hide = "ドックURLを隠す",
 		uninstall_info = "<b>アンインストール</b><br>1. 設定を残す場合は、下の項目で書き出します。<br>2. ツール → スクリプト でこのスクリプトを選び、− を押します。<br>3. 下のフォルダにある Safe_Uninstaller.bat を実行します。手動で消す場合は次のファイルだけを削除し、フォルダ自体は消さないでください。<br><br>%s<br>%s",
 		backup_export_file = "設定の書き出し先", backup_export = "設定を書き出す",
@@ -96,7 +98,7 @@ local I18N = {
 		lang_note = "説明文とソース名への言語反映は、スクリプトの再読み込み (⟳) 後に行われます。",
 		debug_on = "デバッグモード: ON", debug_off = "デバッグモード: OFF",
 		dock_url = "ドックURL",
-		dock_howto = "1. ドックURLをコピーします。\n2. OBSの「ドック → カスタムブラウザドック…」で名前を入力し、URLを貼り付けます。\n3. ドックは WebSocket（ツール → WebSocketサーバー設定）でOBSと通信します。ドック内（⚙）でポート / パスワードを入力してください。",
+		dock_howto = "1. ドックURLをコピーします。\n2. OBSの「ドック → カスタムブラウザドック…」で名前を入力し、URLを貼り付けます。\n3. ドックは WebSocket（ツール → WebSocketサーバー設定）でOBSと通信します。同じポートとパスワードを下の欄に入力します。",
 		auto_fit = "読み込み時に自動で調整する",
 		size_mode = "サイズ", mode_percent = "キャンバスに対する割合", mode_pixels = "ピクセル指定", mode_original = "原寸大",
 		fit_axis = "合わせる方向", axis_both = "縦横（はみ出さない）", axis_width = "横", axis_height = "縦",
@@ -108,6 +110,7 @@ local I18N = {
 		file = "ファイル", file_filter = "ゲーム画像", texture = "テクスチャ", err_load = "⚠ このファイルは読み込めません: %s",
 	},
 	ko = {
+		ws_host = "WebSocket 호스트", ws_port = "WebSocket 포트", ws_password = "WebSocket 비밀번호",
 		dock_show = "도크 URL 표시", dock_hide = "도크 URL 숨기기",
 		uninstall_info = "<b>제거</b><br>1. 설정을 유지하려면 아래 항목에서 내보내세요.<br>2. 도구 → 스크립트에서 이 스크립트를 선택하고 − 를 누르세요.<br>3. 아래 폴더의 Safe_Uninstaller.bat을 실행하세요. 직접 지울 때는 다음 파일만 삭제하고 폴더 자체는 지우지 마세요.<br><br>%s<br>%s",
 		backup_export_file = "설정 내보내기 위치", backup_export = "설정 내보내기",
@@ -122,7 +125,7 @@ local I18N = {
 		lang_note = "설명과 소스 이름에 언어를 적용하려면 스크립트를 다시 불러오세요 (⟳).",
 		debug_on = "디버그 모드: ON", debug_off = "디버그 모드: OFF",
 		dock_url = "도크 URL",
-		dock_howto = "1. 도크 URL을 복사합니다.\n2. OBS에서 도크 → 사용자 지정 브라우저 도크… 에 이름을 입력하고 URL을 붙여넣습니다.\n3. 도크는 WebSocket(도구 → WebSocket 서버 설정)으로 OBS와 통신합니다. 도크(⚙)에서 포트 / 비밀번호를 입력하세요.",
+		dock_howto = "1. 도크 URL을 복사합니다.\n2. OBS에서 도크 → 사용자 지정 브라우저 도크… 에 이름을 입력하고 URL을 붙여넣습니다.\n3. 도크는 WebSocket(도구 → WebSocket 서버 설정)으로 OBS와 통신합니다. 같은 포트와 비밀번호를 아래 칸에 입력하세요.",
 		auto_fit = "불러올 때 자동으로 조정",
 		size_mode = "크기", mode_percent = "캔버스 대비 비율", mode_pixels = "픽셀 지정", mode_original = "원본 크기",
 		fit_axis = "맞출 방향", axis_both = "가로세로 (벗어나지 않게)", axis_width = "가로", axis_height = "세로",
@@ -134,6 +137,7 @@ local I18N = {
 		file = "파일", file_filter = "게임 이미지", texture = "텍스처", err_load = "⚠ 이 파일을 읽을 수 없습니다: %s",
 	},
 	id = {
+		ws_host = "Host WebSocket", ws_port = "Port WebSocket", ws_password = "Kata sandi WebSocket",
 		dock_show = "Tampilkan URL Dock", dock_hide = "Sembunyikan URL Dock",
 		uninstall_info = "<b>Hapus instalasi</b><br>1. Ekspor pengaturan di bawah jika ingin menyimpannya.<br>2. Alat → Skrip: pilih skrip ini lalu tekan −.<br>3. Jalankan Safe_Uninstaller.bat dari folder di bawah. Untuk menghapus manual, hapus hanya file berikut dan jangan hapus foldernya:<br><br>%s<br>%s",
 		backup_export_file = "Ekspor pengaturan ke", backup_export = "Ekspor pengaturan",
@@ -148,7 +152,7 @@ local I18N = {
 		lang_note = "Muat ulang skrip (⟳) untuk menerapkan bahasa pada deskripsi dan nama sumber.",
 		debug_on = "Mode Debug: ON", debug_off = "Mode Debug: OFF",
 		dock_url = "URL Dock",
-		dock_howto = "1. Salin URL Dock.\n2. Di OBS: Dock → Dock Peramban Kustom… → masukkan nama dan tempel URL.\n3. Dock berkomunikasi dengan OBS melalui WebSocket (Alat → Pengaturan Server WebSocket). Masukkan port / kata sandi di dock (⚙).",
+		dock_howto = "1. Salin URL Dock.\n2. Di OBS: Dock → Dock Peramban Kustom… → masukkan nama dan tempel URL.\n3. Dock berkomunikasi dengan OBS melalui WebSocket (Alat → Pengaturan Server WebSocket). Masukkan port / kata sandi yang sama di bawah.",
 		auto_fit = "Sesuaikan otomatis saat dimuat",
 		size_mode = "Ukuran", mode_percent = "Persen dari kanvas", mode_pixels = "Ukuran piksel", mode_original = "Ukuran asli",
 		fit_axis = "Sesuaikan ke", axis_both = "Lebar dan tinggi (tetap di dalam)", axis_width = "Lebar", axis_height = "Tinggi",
@@ -160,6 +164,7 @@ local I18N = {
 		file = "File", file_filter = "Gambar game", texture = "Tekstur", err_load = "⚠ File ini tidak dapat dibaca: %s",
 	},
 	fr = {
+		ws_host = "Hôte WebSocket", ws_port = "Port WebSocket", ws_password = "Mot de passe WebSocket",
 		dock_show = "Afficher l'URL du dock", dock_hide = "Masquer l'URL du dock",
 		uninstall_info = "<b>Désinstallation</b><br>1. Exportez vos réglages ci-dessous si vous voulez les garder.<br>2. Outils → Scripts : sélectionnez ce script et cliquez sur −.<br>3. Lancez Safe_Uninstaller.bat depuis le dossier ci-dessous. Pour supprimer à la main, effacez uniquement ces fichiers, sans toucher au dossier :<br><br>%s<br>%s",
 		backup_export_file = "Exporter les réglages vers", backup_export = "Exporter les réglages",
@@ -174,7 +179,7 @@ local I18N = {
 		lang_note = "Rechargez le script (⟳) pour appliquer la langue à la description et au nom de la source.",
 		debug_on = "Mode débogage : ON", debug_off = "Mode débogage : OFF",
 		dock_url = "URL du dock",
-		dock_howto = "1. Copiez l'URL du dock.\n2. Dans OBS : Docks → Docks de navigateur personnalisés… → saisissez un nom et collez l'URL.\n3. Le dock communique avec OBS via WebSocket (Outils → Paramètres du serveur WebSocket). Saisissez le port / mot de passe dans le dock (⚙).",
+		dock_howto = "1. Copiez l'URL du dock.\n2. Dans OBS : Docks → Docks de navigateur personnalisés… → saisissez un nom et collez l'URL.\n3. Le dock communique avec OBS via WebSocket (Outils → Paramètres du serveur WebSocket). Saisissez le même port / mot de passe ci-dessous.",
 		auto_fit = "Ajuster automatiquement au chargement",
 		size_mode = "Taille", mode_percent = "Pourcentage du canevas", mode_pixels = "Taille en pixels", mode_original = "Taille d'origine",
 		fit_axis = "Ajuster à", axis_both = "Largeur et hauteur (sans dépasser)", axis_width = "Largeur", axis_height = "Hauteur",
@@ -186,6 +191,7 @@ local I18N = {
 		file = "Fichier", file_filter = "Images de jeu", texture = "Texture", err_load = "⚠ Impossible de lire ce fichier : %s",
 	},
 	zh_TW = {
+		ws_host = "WebSocket 主機", ws_port = "WebSocket 連接埠", ws_password = "WebSocket 密碼",
 		dock_show = "顯示 Dock 網址", dock_hide = "隱藏 Dock 網址",
 		uninstall_info = "<b>解除安裝</b><br>1. 若要保留設定，請先在下方匯出。<br>2. 在 工具 → 腳本 中選取此腳本並按 −。<br>3. 執行下方資料夾中的 Safe_Uninstaller.bat。若要手動刪除，請只刪除下列檔案，不要刪除資料夾本身。<br><br>%s<br>%s",
 		backup_export_file = "設定匯出至", backup_export = "匯出設定",
@@ -200,7 +206,7 @@ local I18N = {
 		lang_note = "重新載入腳本 (⟳) 後，說明文字與來源名稱才會套用新語言。",
 		debug_on = "偵錯模式：ON", debug_off = "偵錯模式：OFF",
 		dock_url = "Dock 網址",
-		dock_howto = "1. 複製 Dock 網址。\n2. 在 OBS 中：停駐視窗 → 自訂瀏覽器停駐視窗… → 輸入名稱並貼上網址。\n3. Dock 透過 WebSocket（工具 → WebSocket 伺服器設定）與 OBS 通訊，請在 Dock（⚙）中輸入連接埠與密碼。",
+		dock_howto = "1. 複製 Dock 網址。\n2. 在 OBS 中：停駐視窗 → 自訂瀏覽器停駐視窗… → 輸入名稱並貼上網址。\n3. Dock 透過 WebSocket（工具 → WebSocket 伺服器設定）與 OBS 通訊，請在下方輸入相同的連接埠與密碼。",
 		auto_fit = "載入時自動調整",
 		size_mode = "大小", mode_percent = "畫布比例", mode_pixels = "指定像素", mode_original = "原始大小",
 		fit_axis = "對齊方向", axis_both = "寬高（不超出）", axis_width = "寬", axis_height = "高",
@@ -954,10 +960,22 @@ local function file_url(path)
 	return "file:///" .. enc
 end
 
+-- The dock has no connection fields, so it reads these from here, like OBS's own WebSocket settings.
+local ws_json = '{"host":"localhost","port":4455,"password":""}'
+
+local function set_ws(settings)
+	local function quoted(s)
+		return '"' .. (s:gsub('[%c"\\]', function(c) return string.format("\\u%04x", c:byte()) end)) .. '"'
+	end
+	local host = obs.obs_data_get_string(settings, "ws_host")
+	ws_json = string.format('{"host":%s,"port":%d,"password":%s}', quoted(host ~= "" and host or "localhost"),
+		obs.obs_data_get_int(settings, "ws_port"), quoted(obs.obs_data_get_string(settings, "ws_password")))
+end
+
 local function write_dock_state()
 	local st = string.format(
-		'irrState({"lang":"%s","pos":"%s","name":"%s","version":"%s","buildDate":"%s","author":"%s"});',
-		current_lang, cfg.pos, SCRIPT_NAME, VERSION, format_date(BUILD_DATE, current_lang), AUTHOR)
+		'irrState({"lang":"%s","pos":"%s","name":"%s","version":"%s","buildDate":"%s","author":"%s","ws":%s});',
+		current_lang, cfg.pos, SCRIPT_NAME, VERSION, format_date(BUILD_DATE, current_lang), AUTHOR, ws_json)
 	obs.os_quick_write_utf8_file(script_dir() .. STATE_JS, st, #st, false)
 end
 
@@ -996,7 +1014,7 @@ local SCRIPT_LABELS = {
 }
 
 local UNINSTALL_FILES = "obs_image_resize_reader.lua<br>obs_image_resize_reader_dock.html<br>obs_image_resize_reader_prefs.json<br>obs_image_resize_reader_state.js"
-local BACKUP_SKIP = { "dock_url", "backup_export_file", "backup_import_file" }
+local BACKUP_SKIP = { "dock_url", "ws_password", "backup_export_file", "backup_import_file" }
 
 local DEBUG_LABELS = {
 	backup_export_file = "backup_export_file", backup_export = "backup_export",
@@ -1006,7 +1024,10 @@ local DEBUG_LABELS = {
 local dock_shown = false
 
 local function apply_debug_props(props)
-	for _, name in ipairs({ "dock_url", "dock_info" }) do
+	for _, name in ipairs({ "ws_host", "ws_port", "ws_password" }) do
+		obs.obs_property_set_description(obs.obs_properties_get(props, name), T(name))
+	end
+	for _, name in ipairs({ "dock_url", "dock_info", "ws_host", "ws_port", "ws_password" }) do
 		obs.obs_property_set_visible(obs.obs_properties_get(props, name), dock_shown or debug_mode)
 	end
 	obs.obs_property_set_description(obs.obs_properties_get(props, "dock_toggle"), T(dock_shown and "dock_hide" or "dock_show"))
@@ -1196,6 +1217,9 @@ function script_properties()
 	obs.obs_properties_add_button(props, "dock_toggle", T("dock_show"), on_dock_toggle)
 	obs.obs_properties_add_text(props, "dock_url", T("dock_url"), obs.OBS_TEXT_DEFAULT)
 	obs.obs_properties_add_text(props, "dock_info", T("dock_howto"), obs.OBS_TEXT_INFO)
+	obs.obs_properties_add_text(props, "ws_host", T("ws_host"), obs.OBS_TEXT_DEFAULT)
+	obs.obs_properties_add_int(props, "ws_port", T("ws_port"), 1, 65535, 1)
+	obs.obs_properties_add_text(props, "ws_password", T("ws_password"), obs.OBS_TEXT_PASSWORD)
 	obs.obs_properties_add_button(props, "debug_toggle", T("debug_off"), on_debug_toggle)
 
 	add_debug_props(props)
@@ -1206,6 +1230,9 @@ end
 function script_defaults(settings)
 	obs.obs_data_set_default_string(settings, "language", "auto")
 	obs.obs_data_set_default_bool(settings, "debug_mode", false)
+	obs.obs_data_set_default_string(settings, "ws_host", "localhost")
+	obs.obs_data_set_default_int(settings, "ws_port", 4455)
+	obs.obs_data_set_default_string(settings, "ws_password", "")
 	obs.obs_data_set_default_bool(settings, "auto_fit", true)
 	obs.obs_data_set_default_string(settings, "size_mode", "percent")
 	obs.obs_data_set_default_string(settings, "fit_axis", "both")
@@ -1217,6 +1244,8 @@ function script_defaults(settings)
 end
 
 function script_update(settings)
+	set_ws(settings)
+	write_dock_state()
 	cfg.auto_fit = obs.obs_data_get_bool(settings, "auto_fit")
 	cfg.mode     = obs.obs_data_get_string(settings, "size_mode")
 	cfg.axis     = obs.obs_data_get_string(settings, "fit_axis")
@@ -1273,6 +1302,7 @@ function script_load(settings)
 	obs.obs_data_set_string(settings, "language", lang_setting)
 	obs.obs_data_set_string(settings, "dock_url", file_url(script_dir() .. DOCK_HTML))
 	debug_mode = obs.obs_data_get_bool(settings, "debug_mode")
+	set_ws(settings)
 
 	obs.obs_register_source(source_def)
 	register_hotkeys(settings)

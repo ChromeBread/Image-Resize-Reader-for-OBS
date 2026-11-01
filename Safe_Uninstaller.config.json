@@ -1,5 +1,6 @@
 {
   "app": "Image Resize Reader for OBS",
+  "admin": true,
   "main": "obs_image_resize_reader.lua",
   "items": [
     { "name": "obs_image_resize_reader.lua", "kind": "core" },
