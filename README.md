@@ -36,3 +36,7 @@ Requires OBS 28+ (built-in obs-websocket v5) on Windows.
 Author: ChromeBread feat. BlackDream ・ License: GPL-2.0
 
 This is an unofficial third-party script. It is not affiliated with or endorsed by the OBS Project.
+
+## Updates
+
+This software does not check for updates or update itself, and no automatic update feature that connects to the internet is planned. To update, follow the developer's link and download the new version from the distribution site yourself: [Releases](../../releases)

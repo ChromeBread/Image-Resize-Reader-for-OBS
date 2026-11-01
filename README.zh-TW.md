@@ -36,3 +36,7 @@ OBS Studio (Windows) Lua 腳本，在新增圖片與影片的瞬間就將其調�
 製作者: ChromeBread feat. BlackDream ・ 授權: GPL-2.0
 
 這是非官方的第三方腳本，與 OBS Project 無關，也未獲其認可。
+
+## 關於更新
+
+本軟體沒有檢查更新或自動更新的功能，今後也沒有實作連網自動更新功能的計畫。需要更新時，請依開發者的連結自行前往發布網站下載: [Releases](../../releases)

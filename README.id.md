@@ -36,3 +36,7 @@ Memerlukan OBS 28+ (obs-websocket v5 bawaan) di Windows.
 Pembuat: ChromeBread feat. BlackDream ・ Lisensi: GPL-2.0
 
 Ini adalah skrip pihak ketiga tidak resmi. Tidak berafiliasi dengan atau didukung oleh OBS Project.
+
+## Tentang pembaruan
+
+Perangkat lunak ini tidak memeriksa pembaruan atau memperbarui dirinya sendiri, dan tidak ada rencana menambahkan fitur pembaruan otomatis yang terhubung ke internet. Untuk memperbarui, ikuti tautan pengembang dan unduh versi baru sendiri dari situs distribusi: [Releases](../../releases)
