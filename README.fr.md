@@ -4,7 +4,7 @@
 
 Un script Lua pour OBS Studio (Windows) qui ajuste images et vidéos au canevas dès leur ajout, pour qu'une grande image ne sorte jamais de l'écran.
 
-<p><img src="docs/images/fr/image_settings.png" alt="Réglages d'Image Resize Reader" width="340"> <img src="docs/images/fr/image_dock.png" alt="Dock Image Resize Reader" width="340"></p>
+<p><img src="docs/images/en/image_settings.png" alt="Réglages d'Image Resize Reader" width="340"> <img src="docs/images/fr/image_dock.png" alt="Dock Image Resize Reader" width="340"></p>
 
 - Taille : 1–100 % du canevas, taille en pixels ou taille d'origine. Ajustement en largeur, en hauteur ou les deux (sans dépasser)
 - Agrandissement optionnel des petites images à la taille choisie
@@ -23,7 +23,7 @@ Les éléments déjà présents dans une scène et les sources ajoutées de nouv
 | `.mp4 .m4v .mov .mkv .webm .avi .flv .ts .m2ts .mts .mpg .mpeg .wmv` | Glisser-déposer, ou Sources → + |
 
 ## Installation
-1. Gardez `obs_image_resize_reader.lua` et `obs_image_resize_reader_dock.html` dans le même dossier.
+1. Placez tout le dossier `Image_Resize_Reader_for_OBS` dans `%APPDATA%\obs-studio\plugin_config\` (collez ce chemin dans la barre d'adresse de l'Explorateur pour l'ouvrir).
 2. OBS → **Outils → Scripts → +** → sélectionnez `obs_image_resize_reader.lua`.
 3. Cliquez sur **Afficher l'URL du dock**, copiez l'**URL du dock**, puis **Docks → Docks de navigateur personnalisés…** → collez-la.
 4. Activez **Outils → Paramètres du serveur WebSocket** et saisissez le même port / mot de passe dans les réglages du script.

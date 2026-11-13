@@ -4,7 +4,7 @@
 
 OBS Studio (Windows) Lua 腳本，在新增圖片與影片的瞬間就將其調整至畫布內，避免大圖超出畫面。
 
-<p><img src="docs/images/zh-TW/image_settings.png" alt="Image Resize Reader 設定" width="340"> <img src="docs/images/zh-TW/image_dock.png" alt="Image Resize Reader 停駐視窗" width="340"></p>
+<p><img src="docs/images/en/image_settings.png" alt="Image Resize Reader 設定" width="340"> <img src="docs/images/zh-TW/image_dock.png" alt="Image Resize Reader 停駐視窗" width="340"></p>
 
 - 大小：畫布的 1–100 %、像素大小或原始大小。可依寬度、高度或兩者 (不超出) 調整
 - 可選擇將小圖放大到指定大小
@@ -23,7 +23,7 @@ OBS Studio (Windows) Lua 腳本，在新增圖片與影片的瞬間就將其調�
 | `.mp4 .m4v .mov .mkv .webm .avi .flv .ts .m2ts .mts .mpg .mpeg .wmv` | 拖放，或 來源 → + |
 
 ## 安裝
-1. 將 `obs_image_resize_reader.lua` 與 `obs_image_resize_reader_dock.html` 放在同一資料夾。
+1. 將整個 `Image_Resize_Reader_for_OBS` 資料夾放到 `%APPDATA%\obs-studio\plugin_config\` (將此路徑貼到檔案總管的網址列即可開啟)。
 2. OBS → **工具 → 腳本 → +** → 選擇 `obs_image_resize_reader.lua`。
 3. 按 **顯示 Dock 網址**，複製 **Dock 網址**，然後在 **停駐視窗 → 自訂瀏覽器停駐視窗…** 貼上。
 4. 啟用 **工具 → WebSocket 伺服器設定**，並在腳本設定中輸入相同的連接埠與密碼。

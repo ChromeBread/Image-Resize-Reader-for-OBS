@@ -23,7 +23,7 @@ Items already in a scene, and sources added again from another scene, are left a
 | `.mp4 .m4v .mov .mkv .webm .avi .flv .ts .m2ts .mts .mpg .mpeg .wmv` | Drag & drop, or Sources → + |
 
 ## Install
-1. Keep `obs_image_resize_reader.lua` and `obs_image_resize_reader_dock.html` in the same folder.
+1. Put the whole `Image_Resize_Reader_for_OBS` folder into `%APPDATA%\obs-studio\plugin_config\` (paste this path into the Explorer address bar to open it).
 2. OBS → **Tools → Scripts → +** → select `obs_image_resize_reader.lua`.
 3. Press **Show Dock URL**, copy the **Dock URL**, then **Docks → Custom Browser Docks…** → paste it.
 4. Enable **Tools → WebSocket Server Settings** and enter the same port / password in the script settings.

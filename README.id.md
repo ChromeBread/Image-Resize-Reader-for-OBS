@@ -4,7 +4,7 @@
 
 Skrip Lua untuk OBS Studio (Windows) yang menyesuaikan gambar dan video ke kanvas saat ditambahkan, sehingga gambar besar tidak keluar dari layar.
 
-<p><img src="docs/images/id/image_settings.png" alt="Pengaturan Image Resize Reader" width="340"> <img src="docs/images/id/image_dock.png" alt="Dock Image Resize Reader" width="340"></p>
+<p><img src="docs/images/en/image_settings.png" alt="Pengaturan Image Resize Reader" width="340"> <img src="docs/images/id/image_dock.png" alt="Dock Image Resize Reader" width="340"></p>
 
 - Ukuran: 1–100 % kanvas, ukuran piksel, atau ukuran asli. Sesuaikan ke lebar, tinggi, atau keduanya (tetap di dalam)
 - Gambar kecil dapat diperbesar ke ukuran yang dipilih
@@ -23,7 +23,7 @@ Item yang sudah ada di adegan dan sumber yang ditambahkan lagi dari adegan lain 
 | `.mp4 .m4v .mov .mkv .webm .avi .flv .ts .m2ts .mts .mpg .mpeg .wmv` | Seret & lepas, atau Sumber → + |
 
 ## Instalasi
-1. Simpan `obs_image_resize_reader.lua` dan `obs_image_resize_reader_dock.html` di folder yang sama.
+1. Letakkan seluruh folder `Image_Resize_Reader_for_OBS` di `%APPDATA%\obs-studio\plugin_config\` (tempel jalur ini di bilah alamat Explorer untuk membukanya).
 2. OBS → **Alat → Skrip → +** → pilih `obs_image_resize_reader.lua`.
 3. Tekan **Tampilkan URL Dock**, salin **URL Dock**, lalu **Dock → Dock Peramban Kustom…** → tempel.
 4. Aktifkan **Alat → Pengaturan Server WebSocket** dan masukkan port / kata sandi yang sama di pengaturan skrip.

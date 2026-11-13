@@ -6,6 +6,7 @@
     { "name": "obs_image_resize_reader.lua", "kind": "core" },
     { "name": "obs_image_resize_reader_dock.html", "kind": "core" },
     { "name": "obs_image_resize_reader_prefs.json", "kind": "settings" },
+    { "name": "obs_image_resize_reader_log.txt", "kind": "generated" },
     { "name": "obs_image_resize_reader_state.js", "kind": "generated" },
     { "name": "obs_image_resize_reader_prefs.json.bak", "kind": "generated" },
     { "name": "obs_image_resize_reader_prefs.json.tmp", "kind": "generated" },

@@ -26,6 +26,7 @@ local AUTHOR      = "ChromeBread feat. BlackDream"
 local DOCK_HTML   = "obs_image_resize_reader_dock.html"
 local STATE_JS    = "obs_image_resize_reader_state.js"
 local PREFS_FILE  = "obs_image_resize_reader_prefs.json"
+local LOG_FILE    = "obs_image_resize_reader_log.txt"
 local POLL_MS     = 300
 local PENDING_MAX = 300 -- seconds an item may stay empty (file dialog open) and still be fitted
 local MAX_FILE    = 512 * 1024 * 1024
@@ -64,6 +65,8 @@ local I18N = {
 		backup_no_file = "Choose a file first.", backup_failed = "The file could not be read or written.",
 		backup_wrong_app = "This file belongs to a different script.",
 		backup_exported = "Settings exported.", backup_imported = "Settings imported. Hotkeys apply after restarting OBS.",
+		log_to_file = "Write a log file", log_export_file = "Export log to", log_export = "Export log",
+		log_exported = "Log exported.", log_none = "There is no log yet.",
 		source_name = "Game Image",
 		desc        = "<p>Fits images and videos to the canvas as soon as they are added, then places them at the position you chose. The dock's nine buttons move the selected item to the edge of the canvas.</p>",
 		version = "Version", build_date = "Build date", author = "Author",
@@ -72,6 +75,7 @@ local I18N = {
 		debug_mode_label = "Debug Mode",
 		dock_url = "Dock URL",
 		dock_howto = "1. Copy the Dock URL.\n2. In OBS: Docks → Custom Browser Docks… → enter a name and paste the URL.\n3. The dock talks to OBS via WebSocket (Tools → WebSocket Server Settings). Enter the same port / password below.",
+		g_fit = "Adjusting loaded images",
 		auto_fit = "Fit automatically on load",
 		size_mode = "Size", mode_percent = "Percent of canvas", mode_pixels = "Pixel size", mode_original = "Original size",
 		fit_axis = "Fit to", axis_both = "Width and height (stay inside)", axis_width = "Width", axis_height = "Height",
@@ -91,6 +95,8 @@ local I18N = {
 		backup_no_file = "先にファイルを選んでください。", backup_failed = "ファイルを読み書きできませんでした。",
 		backup_wrong_app = "別のスクリプトのファイルです。",
 		backup_exported = "設定を書き出しました。", backup_imported = "設定を読み込みました。ホットキーはOBSの再起動後に反映されます。",
+		log_to_file = "ログをファイルに書き出す", log_export_file = "ログの書き出し先", log_export = "ログを書き出す",
+		log_exported = "ログを書き出しました。", log_none = "まだログがありません。",
 		source_name = "ゲーム画像",
 		desc        = "<p>画像や動画を追加した瞬間にキャンバスへ収まる大きさへ調整し、指定した位置に配置します。ドックの9個のボタンを押すと、選択中のアイテムをキャンバスの端まで移動します。</p>",
 		version = "バージョン", build_date = "ビルド日", author = "製作者",
@@ -99,6 +105,7 @@ local I18N = {
 		debug_mode_label = "デバッグモード",
 		dock_url = "ドックURL",
 		dock_howto = "1. ドックURLをコピーします。\n2. OBSの「ドック → カスタムブラウザドック…」で名前を入力し、URLを貼り付けます。\n3. ドックは WebSocket（ツール → WebSocketサーバー設定）でOBSと通信します。同じポートとパスワードを下の欄に入力します。",
+		g_fit = "読み込んだ画像の調整",
 		auto_fit = "読み込み時に自動で調整する",
 		size_mode = "サイズ", mode_percent = "キャンバスに対する割合", mode_pixels = "ピクセル指定", mode_original = "原寸大",
 		fit_axis = "合わせる方向", axis_both = "縦横（はみ出さない）", axis_width = "横", axis_height = "縦",
@@ -118,6 +125,8 @@ local I18N = {
 		backup_no_file = "먼저 파일을 선택하세요.", backup_failed = "파일을 읽거나 쓸 수 없습니다.",
 		backup_wrong_app = "다른 스크립트의 파일입니다.",
 		backup_exported = "설정을 내보냈습니다.", backup_imported = "설정을 가져왔습니다. 단축키는 OBS를 다시 시작하면 적용됩니다.",
+		log_to_file = "로그를 파일로 기록", log_export_file = "로그 내보내기 위치", log_export = "로그 내보내기",
+		log_exported = "로그를 내보냈습니다.", log_none = "아직 로그가 없습니다.",
 		source_name = "게임 이미지",
 		desc        = "<p>이미지와 동영상을 추가하는 즉시 캔버스에 맞게 조정하고 지정한 위치에 배치합니다. 도크의 버튼 9개로 선택한 항목을 캔버스 가장자리까지 이동합니다.</p>",
 		version = "버전", build_date = "빌드 날짜", author = "제작자",
@@ -126,6 +135,7 @@ local I18N = {
 		debug_mode_label = "디버그 모드",
 		dock_url = "도크 URL",
 		dock_howto = "1. 도크 URL을 복사합니다.\n2. OBS에서 도크 → 사용자 지정 브라우저 도크… 에 이름을 입력하고 URL을 붙여넣습니다.\n3. 도크는 WebSocket(도구 → WebSocket 서버 설정)으로 OBS와 통신합니다. 같은 포트와 비밀번호를 아래 칸에 입력하세요.",
+		g_fit = "불러온 이미지 조정",
 		auto_fit = "불러올 때 자동으로 조정",
 		size_mode = "크기", mode_percent = "캔버스 대비 비율", mode_pixels = "픽셀 지정", mode_original = "원본 크기",
 		fit_axis = "맞출 방향", axis_both = "가로세로 (벗어나지 않게)", axis_width = "가로", axis_height = "세로",
@@ -145,6 +155,8 @@ local I18N = {
 		backup_no_file = "Pilih file terlebih dahulu.", backup_failed = "File tidak dapat dibaca atau ditulis.",
 		backup_wrong_app = "File ini milik skrip lain.",
 		backup_exported = "Pengaturan diekspor.", backup_imported = "Pengaturan diimpor. Hotkey berlaku setelah OBS dimulai ulang.",
+		log_to_file = "Tulis file log", log_export_file = "Ekspor log ke", log_export = "Ekspor log",
+		log_exported = "Log diekspor.", log_none = "Belum ada log.",
 		source_name = "Gambar Game",
 		desc        = "<p>Menyesuaikan gambar dan video dengan kanvas saat ditambahkan, lalu menempatkannya di posisi yang dipilih. Sembilan tombol di dock memindahkan item terpilih ke tepi kanvas.</p>",
 		version = "Versi", build_date = "Tanggal build", author = "Pembuat",
@@ -153,6 +165,7 @@ local I18N = {
 		debug_mode_label = "Mode Debug",
 		dock_url = "URL Dock",
 		dock_howto = "1. Salin URL Dock.\n2. Di OBS: Dock → Dock Peramban Kustom… → masukkan nama dan tempel URL.\n3. Dock berkomunikasi dengan OBS melalui WebSocket (Alat → Pengaturan Server WebSocket). Masukkan port / kata sandi yang sama di bawah.",
+		g_fit = "Penyesuaian gambar yang dimuat",
 		auto_fit = "Sesuaikan otomatis saat dimuat",
 		size_mode = "Ukuran", mode_percent = "Persen dari kanvas", mode_pixels = "Ukuran piksel", mode_original = "Ukuran asli",
 		fit_axis = "Sesuaikan ke", axis_both = "Lebar dan tinggi (tetap di dalam)", axis_width = "Lebar", axis_height = "Tinggi",
@@ -172,6 +185,8 @@ local I18N = {
 		backup_no_file = "Choisissez d'abord un fichier.", backup_failed = "Impossible de lire ou d'écrire le fichier.",
 		backup_wrong_app = "Ce fichier appartient à un autre script.",
 		backup_exported = "Réglages exportés.", backup_imported = "Réglages importés. Les raccourcis s'appliquent après le redémarrage d'OBS.",
+		log_to_file = "Écrire un fichier journal", log_export_file = "Exporter le journal vers", log_export = "Exporter le journal",
+		log_exported = "Journal exporté.", log_none = "Aucun journal pour l'instant.",
 		source_name = "Image de jeu",
 		desc        = "<p>Ajuste les images et vidéos au canevas dès leur ajout, puis les place à la position choisie. Les neuf boutons du dock déplacent l'élément sélectionné jusqu'au bord du canevas.</p>",
 		version = "Version", build_date = "Date de build", author = "Auteur",
@@ -180,6 +195,7 @@ local I18N = {
 		debug_mode_label = "Mode débogage",
 		dock_url = "URL du dock",
 		dock_howto = "1. Copiez l'URL du dock.\n2. Dans OBS : Docks → Docks de navigateur personnalisés… → saisissez un nom et collez l'URL.\n3. Le dock communique avec OBS via WebSocket (Outils → Paramètres du serveur WebSocket). Saisissez le même port / mot de passe ci-dessous.",
+		g_fit = "Ajustement des images chargées",
 		auto_fit = "Ajuster automatiquement au chargement",
 		size_mode = "Taille", mode_percent = "Pourcentage du canevas", mode_pixels = "Taille en pixels", mode_original = "Taille d'origine",
 		fit_axis = "Ajuster à", axis_both = "Largeur et hauteur (sans dépasser)", axis_width = "Largeur", axis_height = "Hauteur",
@@ -199,6 +215,8 @@ local I18N = {
 		backup_no_file = "請先選擇檔案。", backup_failed = "無法讀取或寫入檔案。",
 		backup_wrong_app = "此檔案屬於其他腳本。",
 		backup_exported = "已匯出設定。", backup_imported = "已匯入設定。快速鍵會在重新啟動 OBS 後套用。",
+		log_to_file = "將記錄寫入檔案", log_export_file = "記錄匯出至", log_export = "匯出記錄",
+		log_exported = "已匯出記錄。", log_none = "尚無記錄。",
 		source_name = "遊戲圖片",
 		desc        = "<p>在加入圖片或影片的當下自動調整為符合畫布的大小，並放到指定位置。Dock 的 9 個按鈕可將選取的項目移到畫布邊緣。</p>",
 		version = "版本", build_date = "建置日期", author = "製作者",
@@ -207,6 +225,7 @@ local I18N = {
 		debug_mode_label = "偵錯模式",
 		dock_url = "Dock 網址",
 		dock_howto = "1. 複製 Dock 網址。\n2. 在 OBS 中：停駐視窗 → 自訂瀏覽器停駐視窗… → 輸入名稱並貼上網址。\n3. Dock 透過 WebSocket（工具 → WebSocket 伺服器設定）與 OBS 通訊，請在下方輸入相同的連接埠與密碼。",
+		g_fit = "載入圖片的調整",
 		auto_fit = "載入時自動調整",
 		size_mode = "大小", mode_percent = "畫布比例", mode_pixels = "指定像素", mode_original = "原始大小",
 		fit_axis = "對齊方向", axis_both = "寬高（不超出）", axis_width = "寬", axis_height = "高",
@@ -330,8 +349,36 @@ local function read_binary(path)
 	return buf, got[0]
 end
 
+-- Optional log file (Debug Mode), off by default. Kept whole in memory and rewritten,
+-- because io.open cannot open a path with non-ANSI characters (e.g. a Japanese user name).
+local LOG_MAX = 256 * 1024
+local log_path = nil -- set in script_load, once the script folder is known
+local log_to_file = false
+local log_text = nil
+
+-- The Windows user name is part of most paths; it must not reach a log that may be sent to the developer.
+local function mask_user(s)
+	return (tostring(s):gsub("(%a:[/\\][Uu]sers[/\\])[^/\\]+", "%1%%USERNAME%%"))
+end
+
+local function log_file_append(level, msg)
+	if not (log_to_file and log_path) then return end
+	if log_text == nil then
+		local ok, s = pcall(obs.os_quick_read_utf8_file, log_path)
+		log_text = (ok and type(s) == "string") and s or ""
+	end
+	local name = (level == obs.LOG_ERROR and "error") or (level == obs.LOG_WARNING and "warning") or "info"
+	log_text = log_text .. os.date("%Y-%m-%d %H:%M:%S ") .. name .. ": " .. mask_user(msg) .. "\r\n"
+	if #log_text > LOG_MAX then -- drop the older half
+		local cut = log_text:find("\n", #log_text - math.floor(LOG_MAX / 2), true)
+		log_text = cut and log_text:sub(cut + 1) or ""
+	end
+	obs.os_quick_write_utf8_file(log_path, log_text, #log_text, false)
+end
+
 local function log(level, msg)
 	obs.script_log(level, msg)
+	log_file_append(level, msg)
 end
 
 debug_mode = false
@@ -1009,14 +1056,15 @@ resolve_lang()
 --------------------------------------------------------------------------------
 local SCRIPT_LABELS = {
 	language = "language", lang_note = "lang_note", dock_url = "dock_url", dock_info = "dock_howto",
-	auto_fit = "auto_fit", size_mode = "size_mode", fit_axis = "fit_axis", percent = "percent",
+	g_fit = "g_fit", auto_fit = "auto_fit", size_mode = "size_mode", fit_axis = "fit_axis", percent = "percent",
 	px_w = "px_w", px_h = "px_h", upscale = "upscale", load_pos = "load_pos",
 }
 
-local UNINSTALL_FILES = "obs_image_resize_reader.lua<br>obs_image_resize_reader_dock.html<br>obs_image_resize_reader_prefs.json<br>obs_image_resize_reader_state.js"
-local BACKUP_SKIP = { "dock_url", "ws_password", "backup_export_file", "backup_import_file" }
+local UNINSTALL_FILES = "obs_image_resize_reader_log.txt<br>obs_image_resize_reader.lua<br>obs_image_resize_reader_dock.html<br>obs_image_resize_reader_prefs.json<br>obs_image_resize_reader_state.js"
+local BACKUP_SKIP = { "dock_url", "ws_password", "backup_export_file", "backup_import_file", "log_export_file" }
 
 local DEBUG_LABELS = {
+	log_to_file = "log_to_file", log_export_file = "log_export_file", log_export = "log_export",
 	backup_export_file = "backup_export_file", backup_export = "backup_export",
 	backup_import_file = "backup_import_file", backup_import = "backup_import",
 }
@@ -1048,6 +1096,24 @@ local function apply_debug_props(props)
 	if status then obs.obs_property_set_visible(status, debug_mode) end
 end
 
+-- List entries are text too, so they are rebuilt when the language changes (the saved value stays selected).
+local LIST_ITEMS = {
+	size_mode = { { "mode_percent", "percent" }, { "mode_pixels", "pixels" }, { "mode_original", "original" } },
+	fit_axis = { { "axis_both", "both" }, { "axis_width", "width" }, { "axis_height", "height" } },
+	load_pos = {},
+}
+for _, k in ipairs(POSITIONS) do LIST_ITEMS.load_pos[#LIST_ITEMS.load_pos + 1] = { k, k } end
+
+local function fill_lists(props)
+	for name, items in pairs(LIST_ITEMS) do
+		local p = obs.obs_properties_get(props, name)
+		if p then
+			obs.obs_property_list_clear(p)
+			for _, it in ipairs(items) do obs.obs_property_list_add_string(p, T(it[1]), it[2]) end
+		end
+	end
+end
+
 local function apply_script_props(props, settings)
 	for name, key in pairs(SCRIPT_LABELS) do
 		local p = obs.obs_properties_get(props, name)
@@ -1070,13 +1136,16 @@ local function on_language_changed(props, _, settings)
 		resolve_lang()
 		save_prefs()
 		write_dock_state()
+		fill_lists(props)
 	end
 	apply_script_props(props, settings)
 	return true
 end
 
 local function on_mode_changed(props, _, settings)
-	apply_script_props(props, settings)
+	-- The size list sits in a group, so OBS passes the group; labels and Debug Mode live on the top level.
+	local ok, parent = pcall(obs.obs_properties_get_parent, props)
+	apply_script_props((ok and parent) or props, settings)
 	return true
 end
 
@@ -1141,6 +1210,7 @@ local function on_backup_import(props, _)
 	obs.obs_data_set_string(script_settings, "language", lang_setting)
 	if script_update then script_update(script_settings) end
 	write_dock_state()
+	fill_lists(props) -- the imported language may differ
 	apply_script_props(props)
 	set_backup_status(props, T("backup_imported"))
 	return true
@@ -1152,12 +1222,33 @@ local function on_dock_toggle(props, _)
 	return true
 end
 
+local function on_log_export(props, _)
+	local path = backup_path("log_export_file")
+	if path == "" then set_backup_status(props, T("backup_no_file")); return true end
+	if not path:lower():match("%.txt$") then path = path .. ".txt" end
+	local ok, text = pcall(obs.os_quick_read_utf8_file, log_path or "")
+	if not ok or type(text) ~= "string" or text == "" then set_backup_status(props, T("log_none")); return true end
+	local written = obs.os_quick_write_utf8_file(path, text, #text, false)
+	set_backup_status(props, written and T("log_exported") or T("backup_failed"))
+	return true
+end
+
+local function apply_log_setting(settings)
+	local on = obs.obs_data_get_bool(settings, "log_to_file")
+	if on == log_to_file then return end
+	log_to_file = on
+	if on then log(obs.LOG_INFO, SCRIPT_NAME .. " " .. VERSION .. ": log file on") end
+end
+
 local function add_debug_props(props)
 	obs.obs_properties_add_text(props, "uninstall_info", "", obs.OBS_TEXT_INFO)
 	obs.obs_properties_add_path(props, "backup_export_file", "", obs.OBS_PATH_FILE_SAVE, "JSON (*.json)", nil)
 	obs.obs_properties_add_button(props, "backup_export", "", on_backup_export)
 	obs.obs_properties_add_path(props, "backup_import_file", "", obs.OBS_PATH_FILE, "JSON (*.json)", nil)
 	obs.obs_properties_add_button(props, "backup_import", "", on_backup_import)
+	obs.obs_properties_add_bool(props, "log_to_file", "")
+	obs.obs_properties_add_path(props, "log_export_file", "", obs.OBS_PATH_FILE_SAVE, "Text (*.txt)", nil)
+	obs.obs_properties_add_button(props, "log_export", "", on_log_export)
 	obs.obs_properties_add_text(props, "backup_status", " ", obs.OBS_TEXT_INFO)
 end
 
@@ -1193,26 +1284,24 @@ function script_properties()
 	obs.obs_property_set_modified_callback(lp, on_language_changed)
 	obs.obs_properties_add_text(props, "lang_note", T("lang_note"), obs.OBS_TEXT_INFO)
 
-	obs.obs_properties_add_bool(props, "auto_fit", T("auto_fit"))
-	local mp = obs.obs_properties_add_list(props, "size_mode", T("size_mode"),
+	-- One group, so these read as settings of the same thing (the image that was just loaded).
+	local fit = obs.obs_properties_create()
+	obs.obs_properties_add_bool(fit, "auto_fit", T("auto_fit"))
+	local mp = obs.obs_properties_add_list(fit, "size_mode", T("size_mode"),
 		obs.OBS_COMBO_TYPE_LIST, obs.OBS_COMBO_FORMAT_STRING)
-	obs.obs_property_list_add_string(mp, T("mode_percent"), "percent")
-	obs.obs_property_list_add_string(mp, T("mode_pixels"), "pixels")
-	obs.obs_property_list_add_string(mp, T("mode_original"), "original")
 	obs.obs_property_set_modified_callback(mp, on_mode_changed)
-	local ap = obs.obs_properties_add_list(props, "fit_axis", T("fit_axis"),
+	obs.obs_properties_add_list(fit, "fit_axis", T("fit_axis"),
 		obs.OBS_COMBO_TYPE_LIST, obs.OBS_COMBO_FORMAT_STRING)
-	obs.obs_property_list_add_string(ap, T("axis_both"), "both")
-	obs.obs_property_list_add_string(ap, T("axis_width"), "width")
-	obs.obs_property_list_add_string(ap, T("axis_height"), "height")
-	local pc = obs.obs_properties_add_int_slider(props, "percent", T("percent"), 1, 100, 1)
+	local pc = obs.obs_properties_add_int_slider(fit, "percent", T("percent"), 1, 100, 1)
 	obs.obs_property_int_set_suffix(pc, " %")
-	obs.obs_properties_add_int(props, "px_w", T("px_w"), 1, MAX_DIM, 1)
-	obs.obs_properties_add_int(props, "px_h", T("px_h"), 1, MAX_DIM, 1)
-	obs.obs_properties_add_bool(props, "upscale", T("upscale"))
-	local pp = obs.obs_properties_add_list(props, "load_pos", T("load_pos"),
+	obs.obs_properties_add_int(fit, "px_w", T("px_w"), 1, MAX_DIM, 1)
+	obs.obs_properties_add_int(fit, "px_h", T("px_h"), 1, MAX_DIM, 1)
+	obs.obs_properties_add_bool(fit, "upscale", T("upscale"))
+	obs.obs_properties_add_list(fit, "load_pos", T("load_pos"),
 		obs.OBS_COMBO_TYPE_LIST, obs.OBS_COMBO_FORMAT_STRING)
-	for _, k in ipairs(POSITIONS) do obs.obs_property_list_add_string(pp, T(k), k) end
+	fill_lists(fit)
+
+	obs.obs_properties_add_group(props, "g_fit", T("g_fit"), obs.OBS_GROUP_NORMAL, fit)
 
 	obs.obs_properties_add_button(props, "dock_toggle", T("dock_show"), on_dock_toggle)
 	obs.obs_properties_add_text(props, "dock_url", T("dock_url"), obs.OBS_TEXT_DEFAULT)
@@ -1231,6 +1320,7 @@ end
 function script_defaults(settings)
 	obs.obs_data_set_default_string(settings, "language", "auto")
 	obs.obs_data_set_default_bool(settings, "debug_mode", false)
+	obs.obs_data_set_default_bool(settings, "log_to_file", false)
 	obs.obs_data_set_default_string(settings, "ws_host", "localhost")
 	obs.obs_data_set_default_int(settings, "ws_port", 4455)
 	obs.obs_data_set_default_string(settings, "ws_password", "")
@@ -1245,6 +1335,7 @@ function script_defaults(settings)
 end
 
 function script_update(settings)
+	apply_log_setting(settings)
 	set_ws(settings)
 	write_dock_state()
 	cfg.auto_fit = obs.obs_data_get_bool(settings, "auto_fit")
@@ -1300,6 +1391,8 @@ end
 
 function script_load(settings)
 	script_settings = settings
+	log_path = script_dir() .. LOG_FILE
+	apply_log_setting(settings)
 	obs.obs_data_set_string(settings, "language", lang_setting)
 	obs.obs_data_set_string(settings, "dock_url", file_url(script_dir() .. DOCK_HTML))
 	debug_mode = obs.obs_data_get_bool(settings, "debug_mode")

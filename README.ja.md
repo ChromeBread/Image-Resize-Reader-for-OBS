@@ -23,7 +23,7 @@
 | `.mp4 .m4v .mov .mkv .webm .avi .flv .ts .m2ts .mts .mpg .mpeg .wmv` | ドラッグ＆ドロップ、またはソース → + |
 
 ## インストール
-1. `obs_image_resize_reader.lua` と `obs_image_resize_reader_dock.html` を同じフォルダに置きます。
+1. `Image_Resize_Reader_for_OBS` フォルダを丸ごと `%APPDATA%\obs-studio\plugin_config\` に置きます (このパスをエクスプローラーのアドレス欄に貼り付けると開けます)。
 2. OBS → **ツール → スクリプト → +** で `obs_image_resize_reader.lua` を選びます。
 3. **ドックURLを表示** を押して **ドックURL** をコピーし、**ドック → カスタムブラウザドック…** に貼り付けます。
 4. **ツール → WebSocketサーバー設定** を有効にし、同じポートとパスワードをスクリプトの設定に入力します。
