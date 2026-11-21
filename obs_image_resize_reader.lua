@@ -1,3 +1,4 @@
+-- cbOBScripts: order=310 name="Image Resize Reader"
 --[[
 ================================================================================
  Image Resize Reader  -  OBS Studio Lua script (Windows)
